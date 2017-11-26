@@ -1,7 +1,4 @@
-# **Traffic Sign Recognition** 
 
-
----
 
 ## Advanced Lane Finding Project 
 
@@ -19,41 +16,15 @@ The processing steps that are covered in this project are the following:
 * Warp the detected lane boundaries back onto the original image.
 * Output visual display of the lane boundaries and numerical estimation of lane curvature and vehicle position.
 
-
-
 [//]: # (Image References)
-
-![original_cal2_img]:./camera_cal/calibration2.jpg  
-![corrected_cal2_img]:./project_images/corrected_calibration2.jpg  
-
-![original_sample_camera_img]:./project_images/signs_vehicles_xygrad.jpg  
-![corrected_sample_camera_img]:./prohect_images/corrected_signs_vehicles_xygrad.jpg  
-
-![orig_undist_perspective_img]:./project_images/orig_undist_perspective.png  
-![overhead_perspective_img]:./prohect_images/overhead_perspective.png  
-
-
-![overhead_after_threshold_img]:./project_images/overhead_after_threshold.png  
-
-![pixel_to_real_img]:./project_images/pixel_to_real.png
-
-
-
-[image1]: ./examples/visualization.jpg "Visualization"
-[image2]: ./examples/grayscale.jpg        "Grayscaling"
-[image3]: ./examples/random_noise.jpg     "Random Noise"
-[20kmhr_img]: ./examples/20kmhr.jpg           "20 km/hr speed limit"
-[ahead_only_img]: ./examples/ahead_only.jpg       "Ahead only"
-[road_work_img]: ./examples/road_work.jpg        "Road work"
-[stop_img]: ./examples/stop.jpg             "Stop sign"
-[turn_right_ahead_img]: ./examples/turn_right_ahead.jpg  "Turn right ahead"
-[training_hist]: ./examples/training_hist.png
-[valid_hist]: ./examples/validation_hist.png
-[test_hist]: ./examples/test_hist.png
-[20kmhr_orig_img]: ./examples/20kmhr_from_train.png
-[20kmhr_mod_img]: ./examples/20kmhr_from_train_mod.png
-
-
+[original_cal2_img]:./camera_cal/calibration2.jpg  
+[corrected_cal2_img]:./project_images/corrected_calibration2.jpg  
+[original_sample_camera_img]:./project_images/signs_vehicles_xygrad.jpg  
+[corrected_sample_camera_img]:./prohect_images/corrected_signs_vehicles_xygrad.jpg  
+[orig_undist_perspective_img]:./project_images/orig_undist_perspective.png  
+[overhead_perspective_img]:./prohect_images/overhead_perspective.png  
+[overhead_after_threshold_img]:./project_images/overhead_after_threshold.png  
+[pixel_to_real_img]:./project_images/pixel_to_real.png
 
 
 ## Rubric Points
@@ -96,8 +67,6 @@ is shown below.
 
 ![Original Cal Image][original_cal2_img]  
 ![Corrected Cal Image][corrected_cal2_img]  
-
- 
 
 
 
