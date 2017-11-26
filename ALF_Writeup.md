@@ -17,12 +17,12 @@ The processing steps that are covered in this project are the following:
 * Output visual display of the lane boundaries and numerical estimation of lane curvature and vehicle position.
 
 [//]: # (Image References)
-[original_cal2_img]:./camera_calibration/calibration2.jpg  
+[original_cal2_img]:./calibration_images/calibration2.jpg  
 [corrected_cal2_img]:./project_images/corrected_calibration2.jpg  
 [original_sample_camera_img]:./project_images/signs_vehicles_xygrad.jpg  
 [corrected_sample_camera_img]:./project_images/corrected_signs_vehicles_xygrad.jpg  
 [orig_undist_perspective_img]:./project_images/orig_undist_perspective.png  
-[overhead_perspective_img]:./project_images/overhead_perspective.png  
+[overhead_perspective_img]:./project_images/overhead_persective.png  
 [overhead_after_threshold_img]:./project_images/overhead_after_threshold.png  
 [pixel_to_real_img]:./project_images/pixel_to_real.png
 
@@ -36,7 +36,7 @@ Here I will provide a reference to the sections below that address each individu
   - [Color and Gradient Threshold](#color-and-gradient-threshold)
   - [Perspective Transform](#perspective-transform)
   - [Lane Line Finding](#lane-line-finding)
-  - [Lane Curvature](#lane-curvature)
+  - [Lane Curvature and Offset](#lane-curvature-and-offset)
   - [Example Lane Identification Image](#example-lane-identification-image)  
 
 - [Pipeline Video](#pipeline-video)
@@ -65,8 +65,11 @@ The function cv2.calibrateCamera is called with these lists and returns the esti
 An example of the distortion correction applied to the calibration image calibration2.jpg
 is shown below.
 
-![Original Cal][original_cal2_img]
-![Corrected Cal][corrected_cal2_img]
+Original Cal Image
+![Original Cal Image][original_cal2_img]
+
+Corrected Cal Image
+![Corrected Cal Image][corrected_cal2_img]
 
 
 ## Pipeline and Test Images 
@@ -82,24 +85,31 @@ The first step in the pipeline is to undistort the image using the transformatio
 distortion coefficients calculated from the calibration images, as described above. Here is an 
 example of the application of the distortion correction on a sample camera image.
 
-
+Original Camera Image
 ![Original Camera Image][original_sample_camera_img]  
+Undistorted Camera Image
 ![Corrected Camera Image][corrected_sample_camera_img]  
-
 
 
 ### Perspective Transform
 
 The lane line shape and curvature is much easier to detect when the image is projected into
 an overhead view. The transform M is pre-calculated before the image frame loop using 
-M  = cv2.getPerspectiveTransform(src, dst), and then applied directly after the distortion correction
-using 
+```
+M  = cv2.getPerspectiveTransform(src, dst)
+```
+and then applied directly after the distortion correction using
+
+```
 uwframe =  cv2.warpPerspective(image, M, (frame.shape[1],frame.shape[0]), flags=cv2.INTER_LINEAR) 
+```
+
 in the loop. The transform M maps the source points (src) from an original image to 
-the destination points (dst) which are chosen to create this birds eye view.
+the destination points (dst), which are chosen to create this birds eye view.
+
 
 To focus on the lane, src is chosen as an array of four points which roughly represent the lane 
-end points, determined by hand using the image <> and hardcoded. The dst points are chosen
+end points, determined by hand using a sample image and hardcoded. The dst points are chosen
 to form a front facing (screen or image plane) rectangle. The points are 
     
 
@@ -113,8 +123,9 @@ to form a front facing (screen or image plane) rectangle. The points are
 
 Here is an example of the application of the perspective transform
 
- 
+Original Undistorted Image
 ![Original Undistorted Image][orig_undist_perspective_img]   
+Overhead Perspective Image
 ![Overhead Perspective][overhead_perspective_img]
 
 
@@ -153,8 +164,10 @@ The result is normalized and rescaled back to the 0 to 255 range. The routine us
 Below we show an undistorted perspective warped sample image before and after
 this thresholding is applied.      
  
+ Overhead Perspective Before Threshold
 ![Overhead Perspective Before Threshold][overhead_perspective_img]
-![Overhead Perspective After  Threshold][overhead_threshold_img]  
+ Overhead Perspective After Threshold
+![Overhead Perspective After  Threshold][overhead_after_threshold_img]  
 
 
 
@@ -168,15 +181,14 @@ method only for the first initial estimate of the lane line positions at the bot
 #### Initial lane position estimate
 
 Each pixel column of the bottom half of the threshold image is summed, and the peaks 
-in the resulting array are searched for as estimates for these anchor positions.
+in the resulting array are searched for as estimates for these lane "anchor" positions.
  
-This procedure is found in the routine frame_lane_base_pos and is only used as a first initial 
+This procedure is found in the routine frame_lane_base_pos() and is used as a first initial 
 estimate. From there we use the sliding window method for finding points to fit to estimate 
-a lane line. This method is described in <> section of the instructional material. 
+a lane line. This method is described in the Advanced Lane Finding:Sliding Window section of the
+instructional material. 
 
 #### Sliding window method
-
-More description here...
 
 A very important modification we made to this routine is to save points found in the bottom rectangles
 (anchor points) to use for fitting when in later frames there are none. When more than minpix
@@ -198,10 +210,10 @@ class Line():
       self.q_fit_coeff       =      collections.deque(self.current_fit_coeff,self.NFC)   
 ````
  
-#### Fit Coefficient Range Check
-In addition, a range check is also applied to the fit coefficients. If any coefficient is found
-to be out of bounds, then the coefficients for the current image frame are discarded. 
+#### Lane Base Position Range Check
 
+In addition, a range check is also applied to the lane base positions. If either the left or right base positions 
+are found to be out of bounds, then we return to the histogram method to recalculate the base positions. The new base positions reset the window positions at the bottom of the frame images (the base position) in the sliding window method.
 
 
 ### Lane Curvature and Offset
@@ -211,7 +223,7 @@ it is necessary to determine the previously discussed fit coefficients in real s
 
 The conversion from pixel space to real space for these coefficients is straightforward.
 
-
+Pixel space to Real Space Conversion
 ![Pixel space to Real Space Conversion][pixel_to_real_img]  
 
 In lane_finding.py, we do this conversion and print the radius of curvature of the 
@@ -225,11 +237,8 @@ offset =  xframe_center - \
         (rightLane.best_fit_xpts[-1] - leftLane.best_fit_xpts[-1])*xm_per_pix/2.0
 ```
 
-where xm_per_pix converts quantities from pixel space to meters, xframe_center is already expressed 
+where xm_per_pix (see lane_finding.py) converts quantities from pixel space to meters. xframe_center is already expressed 
 in meters.
-
- 
-
  
 
 
