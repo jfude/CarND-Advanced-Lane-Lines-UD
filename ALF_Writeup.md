@@ -17,12 +17,12 @@ The processing steps that are covered in this project are the following:
 * Output visual display of the lane boundaries and numerical estimation of lane curvature and vehicle position.
 
 [//]: # (Image References)
-[original_cal2_img]:./camera_cal/calibration2.jpg  
+[original_cal2_img]:./camera_calibration/calibration2.jpg  
 [corrected_cal2_img]:./project_images/corrected_calibration2.jpg  
 [original_sample_camera_img]:./project_images/signs_vehicles_xygrad.jpg  
-[corrected_sample_camera_img]:./prohect_images/corrected_signs_vehicles_xygrad.jpg  
+[corrected_sample_camera_img]:./project_images/corrected_signs_vehicles_xygrad.jpg  
 [orig_undist_perspective_img]:./project_images/orig_undist_perspective.png  
-[overhead_perspective_img]:./prohect_images/overhead_perspective.png  
+[overhead_perspective_img]:./project_images/overhead_perspective.png  
 [overhead_after_threshold_img]:./project_images/overhead_after_threshold.png  
 [pixel_to_real_img]:./project_images/pixel_to_real.png
 
@@ -65,9 +65,8 @@ The function cv2.calibrateCamera is called with these lists and returns the esti
 An example of the distortion correction applied to the calibration image calibration2.jpg
 is shown below.
 
-![Original Cal Image][original_cal2_img]  
-![Corrected Cal Image][corrected_cal2_img]  
-
+![Original Cal][original_cal2_img]
+![Corrected Cal][corrected_cal2_img]
 
 
 ## Pipeline and Test Images 
