@@ -195,7 +195,6 @@ A very important modification we made to this routine is to save points found in
 pixels are found in the bottom rectangle (the same condition for recentering), the previous  
 set of anchor points are replaced with the newly found points. 
 
-The implementation is quite inefficient, but gets the job done for this project.
 
 #### Smoothing Fit Coefficients
 
@@ -218,18 +217,24 @@ are found to be out of bounds, then we return to the histogram method to recalcu
 
 ### Lane Curvature and Offset
 
-In order to calculate the lane radii of curvature, 
-it is necessary to determine the previously discussed fit coefficients in real space. 
+In order to calculate the lane radii of curvature, it is necessary to determine the previously discussed fit coefficients in real space. 
 
 The conversion from pixel space to real space for these coefficients is straightforward.
 
 Pixel space to Real Space Conversion
 ![Pixel space to Real Space Conversion][pixel_to_real_img]  
 
-In lane_finding.py, we do this conversion and print the radius of curvature of the 
-left and right lane.   
+The radius of curvature is calculated in the following routine in lane_finding.py
 
-The offset is given by the difference of the midpoint of the lane line estimate
+```python
+def radius_of_curvature(fit_coeff,yeval):
+
+    rad = ((1 + (2*fit_coeff[0]*yeval + fit_coeff[1])**2 ) **1.5) / np.absolute(2*fit_coeff[0])
+    return rad
+```
+
+For each video frame, the radius of curvature for the left and right lane as well as an offset 
+is calculated. The offset is given by the difference of the midpoint of the lane line estimate
 and the center of the given frame along the x-direction. In the code this expressed as
 
 ```python 
@@ -241,17 +246,29 @@ where xm_per_pix (see lane_finding.py) converts quantities from pixel space to m
 in meters.
  
 
+### Example Lane Identification Image
+
+Below is an example frame image from the video, where the lane overlay is plotted back down on the original image.
+
+
+
+The output of lane_finding.py corresponding to this frame is 
+```
+Frame#  1   Left(m):  462.175621668    Right(m):  498.90262862    Offset(m):  -0.434047384007
+```
+where left and right here refer to the radii of curvature.
+
 
 ## Pipeline Video
 
-The lane_finding.py program reads the video project_video.py and 
+The lane_finding.py program reads the video project_video.mp4 and 
 plots the lane estimation on each frame. The lane estimation for the project video
 is pretty stable with slight distortion over the sections of the road where there is a paved
-road/concrete section transition. This typically corresponds to transitions from low to high (or high/low) saturation image frames. 
+road/concrete section transition. This typically corresponds to transitions from low to high (or high/low) saturation image frames. The output of the program is project_output.sv3. My output is saved in project_output_final.sv3 and project_output_final.mov.
 
 ## Discussion
 
-Many improvements.
+
 
   
 
