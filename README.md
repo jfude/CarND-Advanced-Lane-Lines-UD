@@ -5,7 +5,7 @@ Udacity CarND-Advanced-Lane-Finding-Project
 
 This repository contains the completed CarND-Advanced-Lane-Finding-Project, which
 demsontrates camera calibration and image processing, for the purpose of detecting line lanes 
-in self-driving car. Topics covered in the latter are gradient and color thresholding and persective
+in a self-driving car. Topics covered in the latter are gradient and color thresholding and persective
 transformations. The primary output of this project was the code lane_finding.py which loads the
 project_video.mp4, and outputs the video with the detected lane drawn as an overlay on each frame.
 The output video is 'project_output.sv3'. My generation of this output has been uploaded as 
@@ -21,9 +21,7 @@ The output video is 'project_output.sv3'. My generation of this output has been 
 - project_output_final.sv3 -- Output video which is the project_video.mp4 with lane detection added (SV3 format)
 - project_output_final.mov -- The same but in Quicktime Movie format.
 
-- lane_finding.py    -- The primary code that detects the lane and outputs radii of curvature and offset
-
-  		      (see write up).
+- lane_finding.py    -- The primary code that detects the lane and outputs radii of curvature and offset (see write up).
 - ./project_images/ -- Directory of images used in the write up.
 
 
