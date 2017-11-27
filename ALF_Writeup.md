@@ -158,7 +158,7 @@ used for the above color thresholding is first converted to gray scale. Then the
 routine is used as follows
 
 ```python
-abs_sobel = np.absolute(cv2.Sobel(gray)img, cv2.CV_64F, 1, 0))
+abs_sobel = np.absolute(cv2.Sobel(gray_img, cv2.CV_64F, 1, 0))
 ```
 
 The result is normalized and rescaled back to the 0 to 255 range. The routine used for the gradient thresholding is abs_sobel_thresh().
