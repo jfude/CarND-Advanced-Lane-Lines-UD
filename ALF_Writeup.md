@@ -203,7 +203,7 @@ set of anchor points are replaced with the newly found points.
 As a way of preventing rapid drastic changes in the lane line estimates,
 for example if the thresholded image does not yield clear lane lines and hence a 
 bad fit, we use a moving average of the fit coefficients. This is implemented with a 
-double ended queue of length twenty.
+double ended queue of length fourteen.
 
 ```python
 class Line():
