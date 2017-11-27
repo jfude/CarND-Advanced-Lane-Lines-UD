@@ -241,7 +241,7 @@ def threshold_frame(img):
     gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
         
     ### grad threshold 
-    grad_thresh   = abs_sobel_thresh(gray,'x',5,(4,255)) 
+    grad_thresh   = abs_sobel_thresh(gray,'x',3,(4,255)) 
     
     ### color threshold
     #color_thresh         = hls_select(img)
