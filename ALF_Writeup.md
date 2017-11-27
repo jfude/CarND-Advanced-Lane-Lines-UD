@@ -139,7 +139,7 @@ was the most significant. We used a color saturation threshold (converting from 
 as was suggested in the teaching material, but we found that **adjusting the bottom threshold  of 
 the saturation as basically an offset above the average saturation in the current scene greatly 
 improved our results**. Specifically, for each scene the minimim saturation threshold was set
-to 10 above the average 
+to 10 above the average.
 
 ```python
 hls = cv2.cvtColor(img, cv2.COLOR_BGR2HLS)
@@ -148,7 +148,9 @@ s_channel = hls[:,:,2]
 s_ave = round(np.mean(s_channel.flatten()))
 thresh = (min(10  + s_ave,255),255)
 ```
-
+We also used a yellow/white selection threshold by selecting for bright red and green together in the same 
+pixel. This is implemented in the yw_select(img) routune (see lane_finding.py). The two color thresholds are combined with
+an inclusive OR.
 
 For the gradient threshold we used only a threshold for a gradient in the x or vertical direction
 (in image space). The lower bound threshold was quite low, only 4. The transformed color image 
@@ -205,14 +207,16 @@ double ended queue of length twenty.
 
 ```python
 class Line():
-      self.NFC               =      20
+      self.NFC               =      14
       self.q_fit_coeff       =      collections.deque(self.current_fit_coeff,self.NFC)   
 ````
  
-#### Lane Base Position Range Check
+#### Lane Base Position Range and Width Check
 
 In addition, a range check is also applied to the lane base positions. If either the left or right base positions 
 are found to be out of bounds, then we return to the histogram method to recalculate the base positions. The new base positions reset the window positions at the bottom of the frame images (the base position) in the sliding window method.
+As well, we implemented a bounds check on the width of the lane at all points, so in a given frame the maximum and minimum width of the lane must be within a certain tolerance for the fit coefficients to be accepted and added to the deque described above.
+
 
 
 ### Lane Curvature and Offset
