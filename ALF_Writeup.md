@@ -25,7 +25,7 @@ The processing steps that are covered in this project are the following:
 [overhead_perspective_img]:./project_images/overhead_persective.png  
 [overhead_after_threshold_img]:./project_images/overhead_after_threshold.png  
 [pixel_to_real_img]:./project_images/pixel_to_real.png
-
+[sample_frame_1_img]:./project_images/sample_frame_1.jpg
 
 ## Rubric Points
 Here I will provide a reference to the sections below that address each individual rubric. The rubric points and descriptions for this project may be found [here](https://review.udacity.com/#!/rubrics/571/view).
@@ -248,9 +248,10 @@ in meters.
 
 ### Example Lane Identification Image
 
-Below is an example frame image from the video, where the lane overlay is plotted back down on the original image.
+Below is an example frame image from the video output, project_output.sv3, where the lane overlay is plotted back down on the original image.
 
-
+Sample Image Frame #1
+![Sample image][sample_frame_1_img]
 
 The output of lane_finding.py corresponding to this frame is 
 ```
@@ -267,6 +268,13 @@ is pretty stable with slight distortion over the sections of the road where ther
 road/concrete section transition. This typically corresponds to transitions from low to high (or high/low) saturation image frames. The output of the program is project_output.sv3. My output is saved in project_output_final.sv3 and project_output_final.mov.
 
 ## Discussion
+
+The code is far from robust or efficient and many improvements could be made. For example, I didn't implement the faster method for searching for points in the sliding window which was suggested in the instructional material. I probably should have experimented more with thresholding before the perspective transformation and made use of the sobel gradient in the y or angular directions. 
+
+I did find it helpful to return to the histogram summing method of finding the base positions when these positions exceed a certain threshold. This helps in cases where the base window picks up stray points not associated with a lane marker and recenters far from the lane, causing all other windows to do the same. Going forward the windows can then completely miss lane points altogether, though they are clearly visible in the overhead binary image.
+
+The method of fit coefficient averaging and the maintenance of "anchor" points (maintaining points in the base position, or bottom, windows) is very innefficient. Would be straightforward to improve this. A range check on the fit coefficients would also be quite helpful.
+
 
 
 
