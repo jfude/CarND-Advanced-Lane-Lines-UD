@@ -259,7 +259,7 @@ Sample Image Frame #1
 
 The output of lane_finding.py corresponding to this frame is 
 ```
-Frame#  1   Left(m):  462.175621668    Right(m):  498.90262862    Offset(m):  -0.434047384007
+Frame#  1   Left(m):  462.176    Right(m):  511.143    Offset(m):  -0.435
 ```
 where left and right here refer to the radii of curvature.
 
