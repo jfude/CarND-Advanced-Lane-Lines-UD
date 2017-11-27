@@ -27,7 +27,7 @@ class Line():
         # current set of xpts generated from most recent fit 
         self.current_fit_xpts  = np.zeros_like(ypts_in)
         # deque holding coefficients from n most recent
-        self.NFC = 20
+        self.NFC = 14
         self.q_fit_coeff       = collections.deque(self.current_fit_coeff,self.NFC)
         # best fit coefficients, average over n fittings
         self.best_fit_coeff    = self.current_fit_coeff 
@@ -138,6 +138,19 @@ def camera_calibration(glob_name):
 
 
 
+######################################################################################
+### yw_select: Threshold color image for high red and green components
+def yw_select(img):
+    rg_diff = 30
+    rl      = 210
+    gl      = 210
+    red     = img[:,:,2]
+    green   = img[:,:,1]
+    diff    = abs(red-green)
+    binary_output = np.zeros_like(red)
+    binary_output[(diff < rg_diff) & (red > rl) & (green > gl)] = 1 
+    return binary_output
+######################################################################################
        
 
 ######################################################################################
@@ -228,11 +241,12 @@ def threshold_frame(img):
     gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
         
     ### grad threshold 
-    grad_thresh   = abs_sobel_thresh(gray,'x',3,(4,255)) 
+    grad_thresh   = abs_sobel_thresh(gray,'x',5,(4,255)) 
     
     ### color threshold
-    color_thresh         = hls_select(img)
+    #color_thresh         = hls_select(img)
 
+    color_thresh         = (hls_select(img) == 1) | (yw_select(img) ==1) 
     ### Make a combined threshold
     combined_thresh = np.zeros_like(grad_thresh)
     combined_thresh[ (grad_thresh == 1) & ( (color_thresh == 1) )] = 1 
@@ -409,6 +423,16 @@ if __name__ == '__main__':
     ym_per_pix = 30/720.0  # meters per pixel in y dimension
     xm_per_pix = 3.7/700.0 # meters per pixel in x dimension
     ###    
+
+    ### Parameters for writing text to frames
+    font                   = cv2.FONT_HERSHEY_SIMPLEX
+    upperLeftCornerOfText = (10,100)
+    fontScale              = 0.5
+    fontColor              = (0,255,255)
+    lineType               = 1
+
+
+
     
     
     ### Load video
@@ -454,7 +478,6 @@ if __name__ == '__main__':
     
     ## Image frame center (in meters). Zero (0) is at the left of the image
     xframe_center =  (frame.shape[1]/2.0) * xm_per_pix  # meters per pixel in x dimension
-    print(frame.shape[0],frame.shape[1])
     
     ## Create lane lines 
     ##     ypts: Uniform set of abscissa points on which the lane lines are evaluated
@@ -474,7 +497,7 @@ if __name__ == '__main__':
         
     
 
-    fCount = frameStart
+    fCount = frameStart 
     initAve = True
 
     ### Sorensen video 3 codec is used for video output
@@ -501,27 +524,13 @@ if __name__ == '__main__':
         
         ### Apply Gradient/Color threshold
         binary_frame = threshold_frame(uwframe)
-
-        
-        #cv2.imshow("Original Undistorted Perspective",uframe)
-        #cv2.imw("./orig_undist_perspective.jpg",uframe)
-        #input("Press ENTER to continue.")
-        #cv2.imshow("Overhead Perspective Before Threshold",uwframe)
-        #cv2.imshow("./overhead_perspective.jpg",uwframe)
-        #input("Press ENTER to continue.")
-        #plt.title("Overhead Perspective After Threshold")
-        #plt.imshow(binary_frame,cmap='gray')
-        #plt.show(block='False')
-        #cv2.imshow("Overhead Perspective After Threshold",binary_frame,cmap='gray')
-        #cv2.imshow("./overhead_perspective.jpg",uwframe)
-        #input("Press ENTER to continue.")
         
 
 
         #binary_frame = threshold_frame(uwframe)
         ## Might want to do each individually
         if( leftLane.base_pos_reset_needed() or rightLane.base_pos_reset_needed()):
-            print("!!Base pos reset...")
+            # print("!!Base pos reset...")
             rval,leftx_base,rightx_base = frame_lane_base_pos(binary_frame,leftbl,rightbl)
             # Set base points
             leftLane.line_base_pos    = leftx_base
@@ -541,25 +550,24 @@ if __name__ == '__main__':
         
         
         
-        ## set left,right fit to laneline if in range and re average if good fit
-        ## with a number of bad fits reset origin
-        ## Calculate these!!
-        #radius of curvature of the line in some units
-        # self.radius_of_curvature = None 
-        # distance in meters of vehicle center from the line
-        #self.line_base_pos = None 
-
         
         ## Plot lane line fit with current best fit
         
         if(initAve):
             leftLane.reset_q_fit(left_fit)
             rightLane.reset_q_fit(right_fit)
+            leftLane.addFitCoeffs(left_fit)
+            rightLane.addFitCoeffs(right_fit)
             initAve=False
 
-        
-        leftLane.addFitCoeffs(left_fit)
-        rightLane.addFitCoeffs(right_fit)
+        else:
+            left_xpts  = left_fit[0]*ypts**2 + left_fit[1]*ypts + left_fit[2]
+            right_xpts = right_fit[0]*ypts**2 + right_fit[1]*ypts + right_fit[2]
+            diff_xpts  = right_xpts - left_xpts
+            #print("max_diff_xpts = ", max(diff_xpts), " min_diff_xpts = ",min(diff_xpts)) 
+            if(max(diff_xpts) < 750 and min(diff_xpts) > 530):
+                leftLane.addFitCoeffs(left_fit)
+                rightLane.addFitCoeffs(right_fit)
 
     
         # Recast the x and y points into usable format for cv2.fillPoly()
@@ -577,18 +585,8 @@ if __name__ == '__main__':
         newwarp = cv2.warpPerspective(color_warp, Minv, (frame.shape[1], frame.shape[0])) 
         # Combine the result with the original image
         result =  cv2.addWeighted(frame, 1, newwarp, 0.3, 0)
-        #cv2.imshow("name",result)
-        video_writer.write(result)
-        #time.sleep(0.5)
-        #cv2.destroyAllWindows()
-        #print(result.shape)
-        #time.sleep(1)
         
         
-        #clip1 = VideoFileClip("test_videos/solidWhiteRight.mp4")
-        #white_clip = clip1.fl_image(process_image) #NOTE: this function expects color images!!
-        #time white_clip.write_videofile(white_output, audio=False)
-
 
         ## Compute the fit coefficients in real space and then the radius of curvature
         left_fit_m[2] = xm_per_pix                 * left_fit[2]
@@ -607,26 +605,23 @@ if __name__ == '__main__':
         offset =  xframe_center - \
         (rightLane.best_fit_xpts[-1] + leftLane.best_fit_xpts[-1])*xm_per_pix/2.0  
 
-        
-        print('\rFrame# ',fCount,'  Left(m): ',left_rc, '   Right(m): ', right_rc, '   Offset(m): ',offset,end='')
-        #print("")
-        #ploty = np.linspace(0, binary_frame.shape[0]-1, binary_frame.shape[0] )
-        #left_fitx = left_fit[0]*ploty**2 + left_fit[1]*ploty + left_fit[2]
-        #right_fitx = right_fit[0]*ploty**2 + right_fit[1]*ploty + right_fit[2]
-        ## use leftLane.current_fitx
 
-        """
-        plt.imshow(out_img)
-        plt.plot(leftLane.best_fit_xpts,  ypts, color='yellow')
-        plt.plot(rightLane.best_fit_xpts, ypts, color='yellow')
-        plt.xlim(0, 1280)
-        plt.ylim(720, 0)    
-        plt.show(block=False)    
-        time.sleep(2)
-        plt.close()
-        """
-        #input("Press ENTER to continue.")
-        #cv2.waitKey(2)
+        fstr = "Frame# {0}".format(fCount) +  "   Left(m):{0:.3f}".format (left_rc) + "  Right(m):{0:.3f}".format(right_rc) +  " Offset(m):{0:.3f}".format(offset) 
+        
+        print('\r',fstr,end='')        
+
+        cv2.putText(result,
+                    fstr,
+                    upperLeftCornerOfText, 
+                    font, 
+                    fontScale,
+                    fontColor,
+                    lineType)
+
+        #cv2.imshow("name",result)
+        video_writer.write(result)
+
+        
     video.release()
     video_writer.release()
     cv2.destroyAllWindows()    
