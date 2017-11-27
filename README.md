@@ -17,13 +17,13 @@ The output video is 'project_output.sv3'. My generation of this output has been 
 ## List of Files
 - README.md          -- this file.
 - ALF_WriteUp.md     -- Description (with examples) of techniques used in this project.  
-- project_video.mp4  -- Input video used for testing lane detection
-- project_output_final.sv3 -- Output video which is the project_video.mp4 with lane detection added (SV3 format)
+- project_video.mp4  -- Input video used for testing lane detection.
+- project_output_final.sv3 -- Output video which is the project_video.mp4 with lane detection added (SV3 format).
 - project_output_final.mov -- The same but in Quicktime Movie format.
 
 - lane_finding.py    -- The primary code that detects the lane and outputs radii of curvature and offset (see write up).
 - ./project_images/ -- Directory of images used in the write up.
-
+- ./calibration_images/ -- Directory of camera calibration images.
 
 ## Installation
 
